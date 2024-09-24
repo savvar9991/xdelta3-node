@@ -1,0 +1,11 @@
+{
+  "optimize": "ReleaseSmall",
+  "quiet": false,
+  "sourceFiles": {
+    "lib/xdelta3-node.zigar": "zig/xdelta3-node.zig"
+  },
+  "targets": [
+    { "platform": "darwin", "arch": "x64" },
+    { "platform": "darwin", "arch": "arm64" }
+  ]
+}
