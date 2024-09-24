@@ -1,0 +1,27 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "lib": [
+      "es2021", "dom"
+    ],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./types"],
+
+    "pretty": true,
+    "strict": true,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+
+    "allowSyntheticDefaultImports": true,
+  }
+}
