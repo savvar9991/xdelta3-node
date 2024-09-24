@@ -19,6 +19,9 @@ When using MacOS, there are a couple of extra prerequisites that are required.
 
 ## Getting Started
 
+- :gear: Run `git submodule init` to initialize submodule.
+- :gear: Run `git submodule update` to fetch latest code for submodules.
+- :gear: Run `npm i` to install dependencies.
 - :gear: Run `npm i` to install dependencies.
 - :gear: Run `npm run build:native` to build native dependencies.
 - :gear: Run `npm run build:ts` to build js lib.
@@ -28,17 +31,6 @@ When using MacOS, there are a couple of extra prerequisites that are required.
 To run tests:
 
 - :test_tube: Run `yarn test:unit` for unit tests.
-- :test_tube: Run `yarn test:e2e` for end-to-end tests.
-- :test_tube: Run `yarn test:spec` for spec tests.
-- :test_tube: Run `yarn test` to run all tests.
-- :test_tube: Run `yarn check-types` to check TypeScript types.
-- :test_tube: Run `yarn lint` to run the linter (ESLint).
-
-Note that to run `test:e2e`, first ensure that the environment is correctly setup by running the `run_e2e_env.sh` script. This script requires a running docker engine.
-
-```sh
-./scripts/run_e2e_env.sh start
-```
 
 ## First Time Contributor?
 
