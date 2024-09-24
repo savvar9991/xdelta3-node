@@ -16,7 +16,7 @@
   "scripts": {
     "start": "node --loader=node-zigar --no-warnings src/index.js",
     "build": "npm run build:native && npm run build:ts",
-    "build:native": "node-zigar build",
+    "build:native": "./scripts/patch_xdelta3.sh && node-zigar build",
     "build:ts": "tsc -p tsconfig.build.json"
   },
   "main": "lib/index.js",
