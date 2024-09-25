@@ -29,9 +29,12 @@ jobs:
       - name: Initialize git submodules
         shell: bash
         run: git submodule init && git submodule update
-      - name: Install & build
+      - name: Install npm 
         shell: bash
-        run: npm install && npm run build
+        run: npm install
+      - name: Build
+        shell: bash
+        run: npm run build
       - name: Check Build
         shell: bash
         run: npm run check:build
@@ -55,8 +58,11 @@ jobs:
       - name: Initialize git submodules
         shell: bash
         run: git submodule init && git submodule update
-      - name: Install & build
+      - name: Install npm 
         shell: bash
-        run: npm install && npm run build
+        run: npm install
+      - name: Build
+        shell: bash
+        run: npm run build
       - name: Unit tests
         run: npm run test:unit
