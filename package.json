@@ -18,7 +18,8 @@
     "build": "npm run build:native && npm run build:ts",
     "build:native": "./scripts/patch_xdelta3.sh && node-zigar build",
     "build:ts": "tsc -p tsconfig.build.json",
-    "test:unit": "npx vitest run --dir test/unit"
+    "test:unit": "npx vitest run --dir test/unit",
+    "check:build": "node -e \"(async function() { await import('./lib/index.js') })()\""
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
