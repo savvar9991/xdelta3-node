@@ -13,16 +13,18 @@ interface ZigModule {
 }
 
 const xdelta3Node = createRequire(import.meta.url)(
-  "../lib/xdelta3-node.zigar"
+  process.env.MODE === "test" || process.env.DEV
+    ? "../zig/xdelta3-node.zig"
+    : "../lib/xdelta3-node.zigar"
 ) as ZigModule;
 
 export function encodeSync(src: Uint8Array, dest: Uint8Array): Uint8Array {
   assert(
-    !Array.isArray(src) && src.constructor !== Uint8Array,
+    src.constructor === Uint8Array || Buffer.isBuffer(src),
     "src value should be an Uint8Array"
   );
   assert(
-    !Array.isArray(dest) && dest.constructor !== Uint8Array,
+    dest.constructor === Uint8Array || Buffer.isBuffer(dest),
     "dest value should be an Uint8Array"
   );
 
@@ -31,11 +33,11 @@ export function encodeSync(src: Uint8Array, dest: Uint8Array): Uint8Array {
 
 export function decodeSync(src: Uint8Array, patch: Uint8Array): Uint8Array {
   assert(
-    !Array.isArray(src) && src.constructor !== Uint8Array,
+    src.constructor === Uint8Array || Buffer.isBuffer(src),
     "src value should be an Uint8Array"
   );
   assert(
-    !Array.isArray(patch) && patch.constructor !== Uint8Array,
+    patch.constructor === Uint8Array || Buffer.isBuffer(patch),
     "patch value should be an Uint8Array"
   );
 
