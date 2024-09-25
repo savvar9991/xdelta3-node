@@ -26,6 +26,9 @@ jobs:
           node-version: ${{matrix.node}}
           check-latest: true
           cache: npm
+      - name: Initialize git submodules
+        shell: bash
+        run: git submodule init && git submodule update
       - name: Install & build
         shell: bash
         run: npm install && npm run build
@@ -49,6 +52,9 @@ jobs:
           node-version: ${{matrix.node}}
           check-latest: true
           cache: npm
+      - name: Initialize git submodules
+        shell: bash
+        run: git submodule init && git submodule update
       - name: Install & build
         shell: bash
         run: npm install && npm run build
