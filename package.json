@@ -18,7 +18,7 @@
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "ava",
+    "test": "vitest run --dir test/unit",
     "universal": "napi universal",
     "version": "napi version"
   },
@@ -29,6 +29,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/node": "^22.7.2",
     "@napi-rs/cli": "^2.18.4",
     "vitest": "^2.1.1"
   },
