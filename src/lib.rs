@@ -9,8 +9,6 @@ extern crate napi_derive;
 pub enum XDelta3Error {
   EncodingError,
   DecodingError,
-  XDelta3Error(String),
-  Other(String),
 }
 
 impl AsRef<str> for XDelta3Error {
@@ -18,8 +16,6 @@ impl AsRef<str> for XDelta3Error {
     match self {
       XDelta3Error::EncodingError => "ENCODING_ERROR",
       XDelta3Error::DecodingError => "DECODING_ERROR",
-      XDelta3Error::Other(err) => err.as_str(),
-      XDelta3Error::XDelta3Error(err) => err.as_str(),
     }
   }
 }
@@ -32,13 +28,23 @@ pub fn encode_sync(src: Uint8Array, dest: Uint8Array) -> Result<Uint8Array, Erro
       return Ok(Uint8Array::from(data));
     }
     None => {
-      return Err(Error::new(XDelta3Error::EncodingError, "Encoding Error"));
+      return Err(Error::new(
+        XDelta3Error::EncodingError,
+        "empty encoding response",
+      ));
     }
   }
 }
 
 #[napi]
 pub fn decode_sync(src: Uint8Array, patch: Uint8Array) -> Result<Uint8Array, Error<XDelta3Error>> {
+  if patch.len() == 0 {
+    return Err(Error::new(
+      XDelta3Error::DecodingError,
+      "invalid empty patch",
+    ));
+  }
+
   let output = xdelta3::decode(patch.to_vec().as_slice(), src.to_vec().as_slice());
 
   match output {
@@ -46,7 +52,10 @@ pub fn decode_sync(src: Uint8Array, patch: Uint8Array) -> Result<Uint8Array, Err
       return Ok(Uint8Array::from(data));
     }
     None => {
-      return Err(Error::new(XDelta3Error::DecodingError, "Decoding Error"));
+      return Err(Error::new(
+        XDelta3Error::DecodingError,
+        "empty decoding response",
+      ));
     }
   }
 }

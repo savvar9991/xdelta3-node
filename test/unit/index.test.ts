@@ -22,12 +22,26 @@ function taFor(text: string): Uint8Array {
   return Uint8Array.from(Buffer.from(text, "utf8"));
 }
 
+const emptyPatch = new Uint8Array([
+  214, 195, 196, 0, 0, 1, 4, 0, 7, 4, 0, 0, 1, 1, 20, 0,
+]);
+
 describe("xdelta3-node", () => {
   describe("encodeSync", () => {
-    it("should not throw any error", () => {
-      expect(() =>
-        encodeSync(taFor("init"), taFor("init-updated"))
-      ).not.toThrow();
+    it("should throw error with empty src and dest", () => {
+      expect(() => encodeSync(taFor(""), taFor(""))).toThrowError(
+        "empty encoding response"
+      );
+    });
+
+    it("should throw error with an empty dest", () => {
+      expect(() => encodeSync(taFor("init"), taFor(""))).toThrowError(
+        "empty encoding response"
+      );
+    });
+
+    it("should not throw any error for dest without any change", () => {
+      expect(encodeSync(taFor("init"), taFor("init"))).toEqual(emptyPatch);
     });
 
     it("should encode successfully", () => {
@@ -63,6 +77,18 @@ describe("xdelta3-node", () => {
   });
 
   describe("decodeSync", () => {
+    it("should throw error for empty src and patch", () => {
+      expect(() => decodeSync(taFor(""), taFor(""))).toThrowError(
+        "invalid empty patch"
+      );
+    });
+
+    it("should throw error for empty patch", () => {
+      expect(() => decodeSync(taFor("init"), taFor(""))).toThrowError(
+        "invalid empty patch"
+      );
+    });
+
     it("should not throw any error", () => {
       const patch = encodeSync(
         Buffer.from("init"),
