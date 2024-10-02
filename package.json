@@ -30,7 +30,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.7.2",
-    "@napi-rs/cli": "^2.18.4",
+    "@napi-rs/cli": "^3.0.0-alpha.63",
     "vitest": "^2.1.1"
   },
   "keywords": [
@@ -41,8 +41,8 @@
     "RFC3284"
   ],
   "napi": {
-    "name": "xdelta3-node",
-    "triples": {
+    "binaryName": "xdelta3-node",
+    "target": {
       "defaults": false,
       "additional": [
         "aarch64-apple-darwin",
