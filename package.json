@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "A xdelta3 native binding for Nodejs",
-  "license": "LGPL-3.0",
+  "license": "Apache-2.0",
   "author": "ChainSafe Systems",
   "homepage": "https://github.com/ChainSafe/xdelta3-node#readme",
   "repository": {
