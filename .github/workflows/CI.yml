@@ -36,8 +36,8 @@ jobs:
           - aarch64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
           - aarch64-unknown-linux-musl
-          # - x86_64-pc-windows-msvc
-          # - aarch64-pc-windows-msvc
+          - x86_64-pc-windows-msvc
+          - aarch64-pc-windows-msvc
     runs-on: ubuntu-latest
     name: Build - ${{ matrix.targets }}
     steps:
@@ -126,14 +126,15 @@ jobs:
             archicture: arm64
             docker: node:20-alpine
             args: '--platform linux/arm64'
-          # - target: x86_64-pc-windows-msvc
-          #   host: windows-latest
-          #   architecture: x64
-          # - target: aarch64-pc-windows-msvc
-          #   host: windows-latest
-          #   architecture: arm64
+          - target: x86_64-pc-windows-msvc
+            host: windows-latest
+            architecture: x64
+          - target: aarch64-pc-windows-msvc
+            host: windows-latest
+            architecture: arm64
         node: ["20"]
     runs-on: ${{ matrix.settings.host }}
+    name: Test node@${{ matrix.node }} - ${{ matrix.settings.archicture }}
     needs:
       - build
     steps:
@@ -160,7 +161,7 @@ jobs:
       - name: Setup docker 
         if: ${{ matrix.settings.docker }}
         run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      - name: Run tests in docker
+      - name: Run tests in docker for x86_64
         if: ${{ matrix.settings.docker && contains(matrix.settings.target, 'aarch64') }}
         uses: addnab/docker-run-action@v3
         with:
@@ -170,7 +171,7 @@ jobs:
             set -e
             yarn add -D @rollup/rollup-linux-arm64-gnu @rollup/rollup-linux-arm64-musl
             yarn test
-      - name: Run tests in docker
+      - name: Run tests in docker for aarch64
         if: ${{ matrix.settings.docker && !contains(matrix.settings.target, 'aarch64') }}
         uses: addnab/docker-run-action@v3
         with:
