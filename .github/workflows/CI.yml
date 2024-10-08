@@ -134,7 +134,7 @@ jobs:
             architecture: arm64
         node: ["20"]
     runs-on: ${{ matrix.settings.host }}
-    name: Test node@${{ matrix.node }} - ${{ matrix.settings.archicture }}
+    name: Test node@${{ matrix.node }} - ${{ matrix.settings.target }}
     needs:
       - build
     steps:
