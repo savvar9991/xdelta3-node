@@ -36,8 +36,8 @@ jobs:
           - aarch64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
           - aarch64-unknown-linux-musl
-          - x86_64-pc-windows-msvc
-          - aarch64-pc-windows-msvc
+          # - x86_64-pc-windows-msvc
+          # - aarch64-pc-windows-msvc
     runs-on: ubuntu-latest
     name: Build - ${{ matrix.targets }}
     steps:
@@ -107,27 +107,31 @@ jobs:
             host: macos-latest
             architecture: arm64
           - target: x86_64-unknown-linux-gnu
-            host: ubutnu-latest            
+            host: ubuntu-latest
             archicture: x64
-            docker: true
+            docker: node:20-slim
+            args: ''
           - target: aarch64-unknown-linux-gnu
-            host: ubutnu-latest
+            host: ubuntu-latest
             archicture: arm64
-            docker: true
+            docker: node:20-slim
+            args: '--platform linux/arm64'
           - target: x86_64-unknown-linux-musl
-            host: ubutnu-latest
+            host: ubuntu-latest
             archicture: x64
-            docker: true
+            docker: node:20-alpine
+            args: ''
           - target: aarch64-unknown-linux-musl            
-            host: ubutnu-latest
+            host: ubuntu-latest
             archicture: arm64
-            docker: true
-          - target: x86_64-pc-windows-msvc
-            host: windows-latest
-            architecture: x64
-          - target: aarch64-pc-windows-msvc
-            host: windows-latest
-            architecture: arm64
+            docker: node:20-alpine
+            args: '--platform linux/arm64'
+          # - target: x86_64-pc-windows-msvc
+          #   host: windows-latest
+          #   architecture: x64
+          # - target: aarch64-pc-windows-msvc
+          #   host: windows-latest
+          #   architecture: arm64
         node: ["20"]
     runs-on: ${{ matrix.settings.host }}
     needs:
@@ -145,8 +149,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-      - name: Run tests
-        if: not(${{ matrix.settings.docker }})
+      - name: Run tests on host
+        if: ${{ !matrix.settings.docker }}
         run: yarn test
       - name: Set up QEMU
         if: ${{ matrix.settings.docker }}
@@ -156,8 +160,18 @@ jobs:
       - name: Setup docker 
         if: ${{ matrix.settings.docker }}
         run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      - name: Run tests
-        if: ${{ matrix.settings.docker }}
+      - name: Run tests in docker
+        if: ${{ matrix.settings.docker && contains(matrix.settings.target, 'aarch64') }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: ${{ matrix.settings.args }} -v ${{ github.workspace }}:/build -w /build
+          run: |
+            set -e
+            yarn add -D @rollup/rollup-linux-arm64-gnu @rollup/rollup-linux-arm64-musl
+            yarn test
+      - name: Run tests in docker
+        if: ${{ matrix.settings.docker && !contains(matrix.settings.target, 'aarch64') }}
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.settings.docker }}
@@ -165,4 +179,4 @@ jobs:
           run: |
             set -e
             yarn test
-            
+    
