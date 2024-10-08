@@ -8,7 +8,7 @@
   "homepage": "https://github.com/ChainSafe/xdelta3-node#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com:ChainSafe/xdelta3-node.git"
+    "url": "git+https://github.com/ChainSafe/xdelta3-node.git"
   },
   "bugs": {
     "url": "https://github.com/ChainSafe/xdelta3-node/issues"
