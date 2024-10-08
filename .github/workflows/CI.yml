@@ -1,0 +1,183 @@
+name: CI
+env:
+  DEBUG: napi:*
+  APP_NAME: xdelta3-node
+  RUST_BACKTRACE: full
+permissions:
+  contents: write
+  id-token: write
+"on":
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "**"
+    paths-ignore:
+      - "**/*.md"
+      - LICENSE
+      - "**/*.gitignore"
+      - .editorconfig
+      - docs/**
+  pull_request: null
+
+defaults: 
+  run: 
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        targets:
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+          - x86_64-pc-windows-msvc
+          # - aarch64-pc-windows-msvc
+    runs-on: ubuntu-latest
+    name: Build - ${{ matrix.targets }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+            ${{ github.workspace }}/.xwin
+            ~/.napi-rs
+            ./target
+          key: ${{ matrix.targets }}-cargo-cache
+      - name: Install Rust Tool Chain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.targets }}
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install ziglang
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.13.0
+      - name: Install packages
+        run: sudo apt install libclang-dev llvm
+        shell: bash
+      - name: Install cargo toolchains for windows
+        if: ${{ contains(matrix.targets, 'msvc') }}
+        uses: taiki-e/install-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tool: cargo-xwin
+      - name: Install cargo toolchains for linux/unix
+        if: ${{ !contains(matrix.targets, 'msvc') }}
+        uses: taiki-e/install-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tool: cargo-zigbuild
+      - name: Install rupstup target
+        run: rustup target add ${{ matrix.targets }}
+        shell: bash
+      - run: yarn install
+      - name: Build
+        run: yarn build --target ${{ matrix.targets }} --cross-compile
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.targets }}
+          path: ${{ env.APP_NAME }}.*.node
+          if-no-files-found: error
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - target: x86_64-apple-darwin
+            host: macos-latest
+            architecture: x64
+          - target: aarch64-apple-darwin
+            host: macos-latest
+            architecture: arm64
+          - target: x86_64-unknown-linux-gnu
+            host: ubuntu-latest
+            archicture: x64
+            docker: node:20-slim
+            args: ''
+          - target: aarch64-unknown-linux-gnu
+            host: ubuntu-latest
+            archicture: arm64
+            docker: node:20-slim
+            args: '--platform linux/arm64'
+          - target: x86_64-unknown-linux-musl
+            host: ubuntu-latest
+            archicture: x64
+            docker: node:20-alpine
+            args: ''
+          - target: aarch64-unknown-linux-musl            
+            host: ubuntu-latest
+            archicture: arm64
+            docker: node:20-alpine
+            args: '--platform linux/arm64'
+          - target: x86_64-pc-windows-msvc
+            host: windows-latest
+            architecture: x64
+          # - target: aarch64-pc-windows-msvc
+          #   host: windows-latest
+          #   architecture: arm64
+        node: ["20"]
+    runs-on: ${{ matrix.settings.host }}
+    name: Test node@${{ matrix.node }} - ${{ matrix.settings.target }}
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "yarn"
+          architecture: ${{ matrix.settings.architecture }}
+      - name: Install dependencies
+        run: yarn install
+      - name: Download bindings
+        uses: actions/download-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.target }}
+      - name: Run tests on host
+        if: ${{ !matrix.settings.docker }}
+        run: yarn test
+      - name: Set up QEMU
+        if: ${{ matrix.settings.docker }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64,arm
+      - name: Setup docker 
+        if: ${{ matrix.settings.docker }}
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Run tests in docker for x86_64
+        if: ${{ matrix.settings.docker && contains(matrix.settings.target, 'aarch64') }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: ${{ matrix.settings.args }} -v ${{ github.workspace }}:/build -w /build
+          run: |
+            set -e
+            yarn add -D @rollup/rollup-linux-arm64-gnu @rollup/rollup-linux-arm64-musl
+            yarn test
+      - name: Run tests in docker for aarch64
+        if: ${{ matrix.settings.docker && !contains(matrix.settings.target, 'aarch64') }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: ${{ matrix.settings.args }} -v ${{ github.workspace }}:/build -w /build
+          run: |
+            set -e
+            yarn test
+    

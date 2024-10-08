@@ -1,0 +1,22 @@
+[package]
+edition = "2021"
+name = "chainsafe_xdelta3-node"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
+napi = { version = "2", default-features = false, features = ["napi4"] }
+napi-derive = "2"
+futures-io = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["default", "io"] }
+xdelta3 = { git = "https://github.com:/ChainSafe/xdelta3-rs.git", branch = "nh/update-build-script" }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+strip = "symbols"
