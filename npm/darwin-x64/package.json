@@ -1,12 +1,12 @@
 {
-  "name": "@chainsafe/xdelta3-node-linux-arm64-musl",
+  "name": "@chainsafe/xdelta3-node-darwin-x64",
   "version": "0.1.0",
   "cpu": [
-    "arm64"
+    "x64"
   ],
-  "main": "xdelta3-node.linux-arm64-musl.node",
+  "main": "xdelta3-node.darwin-x64.node",
   "files": [
-    "xdelta3-node.linux-arm64-musl.node"
+    "xdelta3-node.darwin-x64.node"
   ],
   "description": "A xdelta3 native binding for Nodejs",
   "keywords": [
@@ -30,9 +30,6 @@
     "url": "https://github.com/ChainSafe/xdelta3-node/issues"
   },
   "os": [
-    "linux"
-  ],
-  "libc": [
-    "musl"
+    "darwin"
   ]
 }
