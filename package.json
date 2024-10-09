@@ -27,6 +27,10 @@
   "engines": {
     "node": ">= 10"
   },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.7.2",
