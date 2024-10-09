@@ -1,6 +1,6 @@
 {
   "name": "@chainsafe/xdelta3-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "A xdelta3 native binding for Nodejs",
   "license": "Apache-2.0",
@@ -27,6 +27,10 @@
   "engines": {
     "node": ">= 10"
   },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.7.2",
